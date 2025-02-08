@@ -7,23 +7,20 @@ USERNAME = "flx.natan"
 PASSWORD = "11780natan"
 
 # Coordenadas fornecidas
-COORDS_ID = (882, 320)  # Coordenada para o campo "ID"
-COORDS_PIN = (872, 382)  # Coordenada para o campo "PIN"
-COORDS_ENTER = (925, 436)  # Coordenada para o botão "ENTER"
-COORDS_PERFIL = (97, 755)  # Coordenada para "Perfil"
-COORDS_OPCOES = (1324, 175)  # Coordenada para "Opções"
-COORDS_DEFINICOES_PRIVACIDADE = (941, 527)  # Coordenada para "Definições e Privacidade"
-COORDS_AMIGOS_CHEGADOS = (442, 860)  # Coordenada para "Amigos Chegados"
+COORDS_ID = (882, 320)
+COORDS_PIN = (872, 382)
+COORDS_ENTER = (925, 436)
+COORDS_PERFIL = (97, 755)
+COORDS_OPCOES = (1324, 175)
+COORDS_DEFINICOES_PRIVACIDADE = (941, 527)
+COORDS_AMIGOS_CHEGADOS = (442, 860)
 
 # Coordenadas para o primeiro item da lista
-COORDS_INICIAL = (1664, 384)  # Coordenada inicial
-DESLOCAMENTO = (0, 77)  # Deslocamento entre as coordenadas (no seu caso é 77 na coordenada Y)
-
-# Número de itens na lista (ajuste conforme o número real de itens)
-NUM_ITENS = 100  # Ajuste este número conforme o total de itens na lista
-
-# Número de cliques antes de rolar a página
-CLICKS_BEFORE_SCROLL = 7
+COORDS_INICIAL = [1664, 384]  # Usamos lista para poder modificar diretamente
+DESLOCAMENTO = 77  # Distância entre os itens
+SCROLL_DISTANCE = -500  # Quantidade exata de scroll (negativo para descer)
+NUM_ITENS = 100
+CLICKS_BEFORE_SCROLL = 7  # Quantos cliques antes de rolar a tela
 
 # Abrir o menu Iniciar do Windows
 keyboard.press_and_release("win")
@@ -47,70 +44,73 @@ time.sleep(1)
 
 # Pressionar Enter para acessar o site
 keyboard.press_and_release("enter")
-time.sleep(7)  # Tempo maior para garantir que a página carregue completamente
+time.sleep(7)  # Tempo para carregar a página
 
-# **Clicar no campo de usuário usando as coordenadas fornecidas**
-pyautogui.click(COORDS_ID[0], COORDS_ID[1])  # Clica nas coordenadas de ID
+# **Clicar no campo de usuário**
+pyautogui.click(COORDS_ID[0], COORDS_ID[1])
 time.sleep(1)
-
-# Digitar o nome de usuário
 keyboard.write(USERNAME, delay=0.1)
+time.sleep(3)  # Garantir que foi digitado
+
+# **Clicar no campo de senha**
+pyautogui.click(COORDS_PIN[0], COORDS_PIN[1])
 time.sleep(1)
-
-# Garantir que o nome de usuário foi digitado antes de continuar
-time.sleep(3)
-
-# **Clicar no campo de senha usando as coordenadas fornecidas**
-pyautogui.click(COORDS_PIN[0], COORDS_PIN[1])  # Clica nas coordenadas de PIN
-time.sleep(1)
-
-# Digitar a senha
 keyboard.write(PASSWORD, delay=0.1)
 time.sleep(2)
 
-# **Clicar no botão "Enter" usando as coordenadas fornecidas**
-pyautogui.click(COORDS_ENTER[0], COORDS_ENTER[1])  # Clica no botão de login (ENTER)
-time.sleep(8)  # Tempo para o login ser processado
+# **Clicar no botão "Enter"**
+pyautogui.click(COORDS_ENTER[0], COORDS_ENTER[1])
+time.sleep(8)
 
-# **Clicar no "Perfil" após o login**
-pyautogui.click(COORDS_PERFIL[0], COORDS_PERFIL[1])  # Clica nas coordenadas de Perfil
+# **Clicar no "Perfil"**
+pyautogui.click(COORDS_PERFIL[0], COORDS_PERFIL[1])
 time.sleep(5)
 
 # **Clicar em "Opções"**
-pyautogui.click(COORDS_OPCOES[0], COORDS_OPCOES[1])  # Clica nas coordenadas de Opções
+pyautogui.click(COORDS_OPCOES[0], COORDS_OPCOES[1])
 time.sleep(5)
 
 # **Clicar em "Definições e Privacidade"**
-pyautogui.click(COORDS_DEFINICOES_PRIVACIDADE[0], COORDS_DEFINICOES_PRIVACIDADE[1])  # Clica nas coordenadas de Definições e Privacidade
+pyautogui.click(COORDS_DEFINICOES_PRIVACIDADE[0], COORDS_DEFINICOES_PRIVACIDADE[1])
 time.sleep(5)
 
 # **Clicar em "Amigos Chegados"**
-pyautogui.click(COORDS_AMIGOS_CHEGADOS[0], COORDS_AMIGOS_CHEGADOS[1])  # Clica nas coordenadas de Amigos Chegados
+pyautogui.click(COORDS_AMIGOS_CHEGADOS[0], COORDS_AMIGOS_CHEGADOS[1])
 time.sleep(7)
 
-# Função para rolar a página
-def scroll_page():
-    pyautogui.scroll(-500)  # Rolando para baixo
+# Função para rolar a página, ajustar a posição inicial e continuar os cliques
+def precise_scroll():
+    global COORDS_INICIAL  # Precisamos modificar a posição inicial após o scroll
+
+    # Captura a posição atual do mouse antes do scroll
+    mouse_x, mouse_y = pyautogui.position()
+
+    # Faz o scroll exato (negativo para descer)
+    pyautogui.scroll(SCROLL_DISTANCE)
+    time.sleep(1)
+
+    # Move o mouse de volta para a posição inicial antes do scroll
+    pyautogui.moveTo(mouse_x, mouse_y - abs(SCROLL_DISTANCE))
+    time.sleep(1)
+
+    # **Ajusta a posição inicial para o próximo ciclo de cliques**
+    COORDS_INICIAL[1] -= abs(SCROLL_DISTANCE)  # Move para cima conforme o scroll
 
 # Iniciar o loop para clicar nos amigos da lista
 cliques = 0
 for i in range(NUM_ITENS):
-    # Calcula a coordenada do próximo item, com base na coordenada inicial e no deslocamento
-    next_coord = (COORDS_INICIAL[0], COORDS_INICIAL[1] + i * DESLOCAMENTO[1])
+    next_coord = (COORDS_INICIAL[0], COORDS_INICIAL[1] + i * DESLOCAMENTO)
 
     # Mover para o item e clicar
     pyautogui.moveTo(next_coord[0], next_coord[1])
     pyautogui.click(next_coord[0], next_coord[1])
-    time.sleep(1)  # Tempo entre os cliques
+    time.sleep(1)
 
-    # Incrementar o contador de cliques
     cliques += 1
 
-    # Se o número de cliques for 7, rolar a página e reiniciar o contador
+    # Se atingir o limite, faz o scroll e ajusta a posição
     if cliques == CLICKS_BEFORE_SCROLL:
-        scroll_page()  # Realiza o scroll para baixo
-        time.sleep(1)  # Aguarda o tempo do scroll ser processado
-        cliques = 0  # Reseta o contador de cliques
+        precise_scroll()
+        cliques = 0  # Reseta o contador
 
-    # Pausa entre iterações para evitar sobrecarga
-    time.sleep(2)
+    time.sleep(2)  # Pausa entre cliques
