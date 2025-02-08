@@ -15,6 +15,16 @@ COORDS_OPCOES = (1324, 175)  # Coordenada para "Opções"
 COORDS_DEFINICOES_PRIVACIDADE = (941, 527)  # Coordenada para "Definições e Privacidade"
 COORDS_AMIGOS_CHEGADOS = (442, 860)  # Coordenada para "Amigos Chegados"
 
+# Coordenadas para o primeiro item da lista
+COORDS_INICIAL = (1664, 384)  # Coordenada inicial
+DESLOCAMENTO = (0, 77)  # Deslocamento entre as coordenadas (no seu caso é 77 na coordenada Y)
+
+# Número de itens na lista (ajuste conforme o número real de itens)
+NUM_ITENS = 100  # Ajuste este número conforme o total de itens na lista
+
+# Número de cliques antes de rolar a página
+CLICKS_BEFORE_SCROLL = 7
+
 # Abrir o menu Iniciar do Windows
 keyboard.press_and_release("win")
 time.sleep(1)
@@ -26,10 +36,6 @@ time.sleep(1)
 # Pressionar Enter para abrir o Chrome
 keyboard.press_and_release("enter")
 time.sleep(3)  # Aguarda o Chrome abrir
-
-# Maximizar a janela do Chrome (pressionando a tecla Windows + seta para cima)
-keyboard.press_and_release("win+up")
-time.sleep(1)
 
 # Focar na barra de endereços
 keyboard.press_and_release("ctrl+l")
@@ -80,4 +86,31 @@ time.sleep(5)
 
 # **Clicar em "Amigos Chegados"**
 pyautogui.click(COORDS_AMIGOS_CHEGADOS[0], COORDS_AMIGOS_CHEGADOS[1])  # Clica nas coordenadas de Amigos Chegados
-time.sleep(5)
+time.sleep(7)
+
+# Função para rolar a página
+def scroll_page():
+    pyautogui.scroll(-500)  # Rolando para baixo
+
+# Iniciar o loop para clicar nos amigos da lista
+cliques = 0
+for i in range(NUM_ITENS):
+    # Calcula a coordenada do próximo item, com base na coordenada inicial e no deslocamento
+    next_coord = (COORDS_INICIAL[0], COORDS_INICIAL[1] + i * DESLOCAMENTO[1])
+
+    # Mover para o item e clicar
+    pyautogui.moveTo(next_coord[0], next_coord[1])
+    pyautogui.click(next_coord[0], next_coord[1])
+    time.sleep(1)  # Tempo entre os cliques
+
+    # Incrementar o contador de cliques
+    cliques += 1
+
+    # Se o número de cliques for 7, rolar a página e reiniciar o contador
+    if cliques == CLICKS_BEFORE_SCROLL:
+        scroll_page()  # Realiza o scroll para baixo
+        time.sleep(1)  # Aguarda o tempo do scroll ser processado
+        cliques = 0  # Reseta o contador de cliques
+
+    # Pausa entre iterações para evitar sobrecarga
+    time.sleep(2)
