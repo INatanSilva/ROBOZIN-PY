@@ -3,8 +3,8 @@ import keyboard
 import time
 
 # Seu usuário e senha do Instagram
-USERNAME = "flx.natan"
-PASSWORD = "11780natan"
+USERNAME = "" #informe seu usario
+PASSWORD = "" #informe sua senha
 
 # Coordenadas fornecidas
 COORDS_ID = (882, 320)
